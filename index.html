@@ -1576,6 +1576,9 @@ function glowSprite(col){if(glowCache[col])return glowCache[col];const c=documen
 function drawGlow(x,y,r,col,a=1){ctx.globalAlpha=a;ctx.drawImage(glowSprite(col),x-r,y-r,r*2,r*2);ctx.globalAlpha=1;}
 const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return 'rgba('+(n>>16)+','+((n>>8)&255)+','+(n&255)+','+a+')';};
 const skyCache={};
+function titlePanel(x,y,head,val,col,al){ctx.font='bold 13px Georgia,serif';const w1=ctx.measureText(head).width;ctx.font='bold 20px Georgia,serif';const w=Math.max(w1,ctx.measureText(val).width)+24,h=54,x0=al==='right'?x-w:x;
+  ctx.save();ctx.fillStyle='rgba(20,4,16,.78)';ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x0,y,w,h,10);else ctx.rect(x0,y,w,h);ctx.fill();ctx.stroke();ctx.restore();
+  hudText(head,x0+w/2,y+19,13,'center',col);hudText(val,x0+w/2,y+44,20,'center','#fff4f7');}
 function hudText(t,x,y,size=16,al='left',col='#f6e3ea'){ctx.font=`bold ${size}px Georgia,serif`;ctx.textAlign=al;ctx.lineWidth=4;ctx.strokeStyle='#1a0510';ctx.strokeText(t,x,y);ctx.fillStyle=col;ctx.fillText(t,x,y);}
 function drawHUD(){
   drawRosa(22,22,timeF*.05,1.1);hudText('× '+score,38,28,18);if(banked)hudText('🔒'+banked,92,27,13,'left','#9be05a');hudText('★ '+String(points).padStart(6,'0'),12,52,14,'left','#ffe9a0');
@@ -1602,8 +1605,8 @@ function render(){
     ctx.fillStyle='rgba(10,2,10,.35)';ctx.fillRect(0,0,W,H);
     hudText('Cappy',W/2,90,56,'center','#ff5a7a');hudText('la Carpincho',W/2,128,30,'center');
     {const f=ANIM.idle.f[Math.floor(timeF/9)%10];drawFrame(f,W/2,300,1,.9,0,pSheet(),hatFx(f));}timeF++;
-    ctx.save();ctx.translate(26,H/2+20);ctx.rotate(-Math.PI/2);hudText('Créditos: Julian152027',0,0,14,'center','#ffd0dc');ctx.restore();
-    if(openCount!==null)hudText('👀 '+openCount.toLocaleString('es-AR')+(openCount===1?' apertura':' aperturas'),W-14,H-8,12,'right','#d8c8e8');
+    titlePanel(12,14,'CRÉDITOS','Julian152027','#ff5a7a','left');
+    {const n=openCount!==null?openCount:(openLocal||0);titlePanel(W-12,H-68,'👀 VECES ABIERTO',openCount===null&&!openLocal?'…':n.toLocaleString('es-AR'),'#9be05a','right');}
     if(SAVE.hi)hudText('Récord: '+String(SAVE.hi).padStart(6,'0'),W/2,156,15,'center','#ffe9a0');
     const TL=titleList();
     if(TL.length>1)for(const b of TL)drawBtn(b,b.label,b.col);
@@ -1677,7 +1680,7 @@ function loop(now){
   let n=0;while(accu>=1000/60&&n<8){step();accu-=1000/60;n++;}if(n>=8)accu=0;
   musTick();render();requestAnimationFrame(loop);
 }
-let openCount=null;
+let openCount=null,openLocal=0;try{openLocal=(+localStorage.getItem('cappy_opens')||0);if(!sessionStorage.getItem('cappy_open'))openLocal++;localStorage.setItem('cappy_opens',openLocal);}catch(e){}
 (function(){const NS='cappy-la-carpincho-julian152027',K='aperturas';let first=true;try{first=!sessionStorage.getItem('cappy_open');sessionStorage.setItem('cappy_open','1');}catch(e){}
   try{fetch('https://api.counterapi.dev/v1/'+NS+'/'+K+(first?'/up':'')).then(r=>r.json()).then(j=>{if(typeof j.count==='number')openCount=j.count;}).catch(()=>{});}catch(e){}})();
 resize();spawn();buildLevel();requestAnimationFrame(loop);
