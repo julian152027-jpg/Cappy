@@ -78,7 +78,7 @@ addEventListener('resize',resize);
 // ---------- input ----------
 const IS_PC=!(matchMedia&&matchMedia('(pointer:coarse)').matches)&&!('ontouchstart' in window);if(IS_PC)document.documentElement.classList.add('pc');
 const keys={}, inp={L:0,R:0,D:0,J:0}, prevJ={v:0};
-addEventListener('keydown',e=>{if(e.repeat)return;keys[e.code]=1; if(e.code.startsWith('Arrow')||e.code==='Space')e.preventDefault(); tapPos=null;
+addEventListener('keydown',e=>{if(e.repeat)return;keys[e.code]=1;if(adOn||state==='busy')return; if(e.code.startsWith('Arrow')||e.code==='Space')e.preventDefault(); tapPos=null;
   if((e.code==='Escape'||e.code==='KeyP')&&(state==='play'||state==='talk'||state==='pause')){state==='pause'?unPause():doPause();return;}
   if(state==='title'&&SAVE.done&&e.code==='KeyL'){state='select';return;}
   if(state==='shop'&&(e.code==='Enter'||e.code==='Escape'||e.code==='KeyZ'||e.code==='Space')){state='play';prevJ.v=1;shopPrev=null;return;}
@@ -90,7 +90,7 @@ const ptrs=new Map(); let rects=null;
 const BTN={J:'bJ'};
 let stickId=null, stickO=null;
 function getRects(){rects={};for(const k in BTN){const r=document.getElementById(BTN[k]).getBoundingClientRect();rects[k]=r;}return rects;}
-function pd(e){ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});const d=cv.width/innerWidth;tapPos={x:(e.clientX*d-ox)/sc,y:(e.clientY*d-oy)/sc}; anyTap(); e.preventDefault();}
+function pd(e){ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(adOn||state==='busy'){e.preventDefault();return;}const d=cv.width/innerWidth;tapPos={x:(e.clientX*d-ox)/sc,y:(e.clientY*d-oy)/sc}; anyTap(); e.preventDefault();}
 function pm(e){if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});}
 function pu(e){ptrs.delete(e.pointerId);}
 addEventListener('pointerdown',pd,{passive:false});
@@ -128,6 +128,13 @@ function readInput(){
 
 // ---------- audio ----------
 let ac=null;
+const CG=0; // 1 = versión CrazyGames (se activa al armar ese paquete)
+let CGS=null,adOn=0,lastPlay=false;
+function cgInit(){if(!CG)return;try{const S=window.CrazyGames&&window.CrazyGames.SDK;if(!S)return;S.init().then(()=>{CGS=S;try{S.game.loadingStop();}catch(e){}}).catch(()=>{});}catch(e){}}
+function cgAd(type,onReward,onDone){if(!CGS){if(onDone)onDone(false);return;}adOn=1;try{if(ac)ac.suspend();}catch(e){}
+  let fin=0;const end=ok=>{if(fin)return;fin=1;adOn=0;try{if(ac)ac.resume();}catch(e){}if(ok&&onReward)onReward();if(onDone)onDone(ok);};
+  try{CGS.ad.requestAd(type,{adStarted:()=>{adOn=1;try{if(ac)ac.suspend();}catch(e){}},adFinished:()=>end(true),adError:()=>end(false)});}catch(e){end(false);}}
+function cgTrack(){if(!CGS)return;const p=state==='play'&&!adOn;if(p!==lastPlay){lastPlay=p;try{p?CGS.game.gameplayStart():CGS.game.gameplayStop();}catch(e){}}}
 function beep(type){
   if(!ac)return; const t=ac.currentTime, o=ac.createOscillator(), g=ac.createGain(); o.connect(g); g.connect(ac.destination);
   const S={jump:['square',300,600,.12,.07],rosa:['triangle',1200,1800,.09,.09],spring:['square',200,900,.25,.07],
@@ -878,9 +885,10 @@ function spend(p){const w=SAVE.wallet||0;if(w>=p){SAVE.wallet=w-p;}else{score-=(
 function shopBtns(){const B=[],L0=118,AW=W-L0-10,cols=4,cw=Math.min(132,AW/cols-8),cx0=L0+AW/2;
   {const iw=Math.min(cw+4,AW/SHOP_ITEMS.length-6);SHOP_ITEMS.forEach((it,i)=>B.push({kind:'item',it,x:cx0+(i-(SHOP_ITEMS.length-1)/2)*(iw+6),y:140,w:iw,h:38}));}
   OUTFITS.forEach((o,i)=>{const r=Math.floor(i/cols),c=i%cols;B.push({kind:'outfit',it:o,x:cx0+(c-1.5)*(cw+8),y:198+r*42,w:cw,h:36});});
-  B.push({kind:'exit',x:60,y:H-20,w:100,h:30});return B;}
+  B.push({kind:'exit',x:60,y:H-20,w:100,h:30});if(CGS)B.push({kind:'adm',x:W-120,y:H-20,w:210,h:30});return B;}
 function shopTap(){for(const b of shopBtns()){if(!inBtn(b))continue;
   if(b.kind==='exit'){state='play';prevJ.v=1;shopPrev=null;return;}
+  if(b.kind==='adm'){cgAd('rewarded',()=>{SAVE.wallet=(SAVE.wallet||0)+100;saveGame();shopMsg='¡Gracias por mirar! +100 mates.';beep('win');},ok=>{if(!ok)shopMsg='No hay anuncios disponibles ahora. Probá en un rato.';});return;}
   const it=b.it,w=avail();
   if(b.kind==='item'){if(w<it.price){shopMsg='Te faltan '+(it.price-w)+' mates. ¡Seguí juntando!';beep('hurt');return;}
     if(it.id==='cappur'){if(cappur>=5){shopMsg='Ya tenés 5 paquetes de Don Cappur, ¡no te entran más!';return;}cappur++;}
@@ -901,6 +909,7 @@ function drawShop(){
   const B=shopBtns(),ax=B[0].x;hudText('Mejoras',ax-B[0].w/2,118,12,'left','#ffd0dc');hudText('Atuendos (quedan para siempre)',B[SHOP_ITEMS.length].x-B[SHOP_ITEMS.length].w/2,176,12,'left','#ffd0dc');
   for(const b of B){
     if(b.kind==='exit'){drawBtn(b,'Seguir ▶','#9be05a');continue;}
+    if(b.kind==='adm'){drawBtn(b,'📺 Anuncio: +100 🧉','#5fd0ff');continue;}
     const it=b.it,own=b.kind==='outfit'&&(SAVE.outfits||[]).includes(it.id),eq=b.kind==='outfit'&&SAVE.outfit===it.id;
     const col=eq?'#9be05a':own?'#6ab8ff':avail()>=it.price?'#ffd23a':'#776';
     ctx.fillStyle=shopPrev===it.id?'rgba(70,20,60,.95)':'rgba(30,8,32,.95)';ctx.fillRect(b.x-b.w/2,b.y-b.h/2,b.w,b.h);ctx.strokeStyle=col;ctx.lineWidth=2;ctx.strokeRect(b.x-b.w/2,b.y-b.h/2,b.w,b.h);
@@ -1235,7 +1244,7 @@ function addTermo(n,msg){const before=termos;termos=Math.min(MAXT,termos+n);if(t
 function die(){if(P.dead)return;termos=0;flame=0;P.dead=1;P.vy=-7;P.vx=0;P.ground=null;deadT=0;beep('hurt');}
 function puff(x,y,n,col){for(let i=0;i<n;i++)parts.push({x,y,vx:(Math.random()-.5)*3,vy:-Math.random()*2.5,t:0,life:25+Math.random()*15,col});}
 
-function step(){
+function step(){if(state==='busy'||adOn)return;
   readInput();
   timeF2++;
   if(state==='cont'){contT--;if(contT%60===0&&contT>0)beep('rev');if(contT<=0){state='over';beep('hurt');}return;}
@@ -1766,7 +1775,7 @@ function render(){
     hudText('Cappy',W/2,90,56,'center','#ff5a7a');hudText('la Carpincho',W/2,128,30,'center');
     {const f=ANIM.idle.f[Math.floor(timeF/9)%10];drawFrame(f,W/2,300,1,.9,0,pSheet(),hatFx(f));}timeF++;
     titlePanel(12,14,'CRÉDITOS','Julian152027','#ff5a7a','left');
-    {const n=openCount!==null?openCount:(openLocal||0);titlePanel(W-12,H-68,'👀 VECES ABIERTO',openCount===null&&!openLocal?'…':n.toLocaleString('es-AR'),'#9be05a','right');}
+    if(!CG){const n=openCount!==null?openCount:(openLocal||0);titlePanel(W-12,H-68,'👀 VECES ABIERTO',openCount===null&&!openLocal?'…':n.toLocaleString('es-AR'),'#9be05a','right');}
     if(SAVE.hi)hudText('Récord: '+String(SAVE.hi).padStart(6,'0'),W/2,156,15,'center','#ffe9a0');
     const TL=titleList();
     if(TL.length>1)for(const b of TL)drawBtn(b,b.label,b.col);
@@ -1829,8 +1838,8 @@ function anyTap(){
     if(inBtn(B.yes)||(!tapPos&&keys.Space)){lives=3;termos=3;score=lvlScore0;points=lvlStart;P.shield=0;P.speedT=0;startLevel();prevJ.v=1;return;}
     if(inBtn(B.no)){state='over';return;}
     contT=Math.max(1,contT-30);return;}
-  if(state==='over'){state=single===1?'select':'title';musCur=null;return;}
-  if(state==='win'&&winT>140){if(single===2){state='title';musCur=null;}else if(single){state='select';musCur=null;}else if(LV<NMAIN-1){LV=LV+1;startLevel();}else{playVN(endingLines(),()=>{state='title';musCur=null;});}prevJ.v=1;}
+  if(state==='over'){const to=single===1?'select':'title';state='busy';cgAd('midgame',null,()=>{state=to;musCur=null;});return;}
+  if(state==='win'&&winT>140){if(single===2){state='title';musCur=null;}else if(single){state='select';musCur=null;}else if(LV<NMAIN-1){state='busy';cgAd('midgame',null,()=>{LV=LV+1;startLevel();});}else{playVN(endingLines(),()=>{state='title';musCur=null;});}prevJ.v=1;}
 }
 
 let last=performance.now(),accu=0;
@@ -1838,14 +1847,15 @@ function loop(now){
   const dt=now-last;accu+=Math.min(140,dt);last=now;
   if(dt<200&&!document.hidden){ftEMA=ftEMA*.95+dt*.05;
     }
+  cgTrack();if(adOn){accu=0;render();requestAnimationFrame(loop);return;}
   let n=0;while(accu>=1000/60&&n<8){step();accu-=1000/60;n++;}if(n>=8)accu=0;
   musTick();render();requestAnimationFrame(loop);
 }
 let openCount=null,openLocal=0;try{openLocal=(+localStorage.getItem('cappy_opens')||0);if(!sessionStorage.getItem('cappy_open'))openLocal++;localStorage.setItem('cappy_opens',openLocal);}catch(e){}
 (function(){const NS='cappy-la-carpincho-julian152027',K='aperturas';let first=true;try{first=!sessionStorage.getItem('cappy_open');sessionStorage.setItem('cappy_open','1');}catch(e){}
-  try{fetch('https://api.counterapi.dev/v1/'+NS+'/'+K+(first?'/up':'')).then(r=>r.json()).then(j=>{if(typeof j.count==='number')openCount=j.count;}).catch(()=>{});}catch(e){}})();
+  if(!CG)try{fetch('https://api.counterapi.dev/v1/'+NS+'/'+K+(first?'/up':'')).then(r=>r.json()).then(j=>{if(typeof j.count==='number')openCount=j.count;}).catch(()=>{});}catch(e){}})();
 resize();spawn();buildLevel();requestAnimationFrame(loop);
-try{if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
+cgInit();try{if(!CG&&'serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 </script>
 </body>
 </html>
