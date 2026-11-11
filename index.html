@@ -945,6 +945,15 @@ const VN={
   [[11,'red','vendor','r','¡Hasta en el volcán armé la mesita! Llevate algo para la última pelea.'],[11,'red','yellow','r','Te espero arriba, Cappy. Con aura y escudo.']]]
 };
 let vn=null;
+function endingLines(){const n=SAVE.gold?Object.keys(SAVE.gold).filter(k=>+k<NMAIN).length:0,L=NMAIN-1;
+  const out=[[L,'red','rv18','r','Ganaste. Todas las Cappys de colores te reconocemos.'],[L,'red',null,'l','¿Entonces se terminó la aventura?'],
+    [L,'red','vendor','r','Todavía no. Existe el Área 7: el Torneo de Cappys. Peleás contra todas, una tras otra... y al final espera la Cappy Arcoíris.'],
+    [L,'red','vendor','r','Para entrar necesitás los 18 TERMOS DORADOS: uno por cada nivel.'],
+    [L,'red','vendor','r','¿Cómo se consiguen? En cada nivel vencé a TODOS los enemigos. El contador 👾 de arriba a la derecha te dice cuántos quedan.'],
+    [L,'red','vendor','r','Cuando el contador marca ✔, aparece un termo dorado al lado del último enemigo. ¡Agarralo antes de pelear con la jefa!']];
+  if(n>=NMAIN)out.push([L,'red','vendor','r','¡Y vos ya tenés los 18! En el inicio vas a ver el botón 🏆 Área 7.']);
+  else out.push([L,'red','vendor','r','Tenés '+n+' de 18. En el inicio tocá ★ Niveles para rejugar los que te faltan: los que ya tienen termo dorado lo muestran en su tarjeta.']);
+  out.push([L,'red',null,'l','¡A juntar termos dorados, entonces!']);return out;}
 function playVN(lines,onEnd){if(!lines||!lines.length){onEnd();return;}state='vn';vn={lines,i:0,t:0,onEnd,seen:{}};musInit();musPlay('story');}
 const vnSkip=()=>({x:W-140,y:26,w:100,h:28});
 function vnAdvance(){if(!vn)return;if(inBtn(vnSkip())){const f=vn.onEnd;vn=null;f();return;}
@@ -1006,19 +1015,65 @@ const LOSE_TALK=[
 // ---------- diálogos generados por jefa ----------
 const AREA_NAMES=['','Zona Catedral','Zona Pantano Lunar','Zona Castillo Helado','Zona Ruinas de Fuego','Zona Nubes de Tormenta','Zona Galaxia del Mate'];
 const AREA_INTRO=['','','La niebla del Pantano Lunar esconde mates... y cosas raras.','El Castillo Helado: el piso resbala y el viento corta.','Las Ruinas de Fuego: el aire quema y la lava ilumina la noche.','Sobre las Nubes de Tormenta, los rayos marcan el camino.','Más allá del cielo: la Galaxia del Mate, donde nacen todas las yerbas.'];
-function bossDlg(i){const r=LEVELS[i].rival,R=RIVALS[r],N=R.name,k=i%3;
-  if(R.fus){const parts=R.c.map(c=>COLN[c]).join(', ');return [
-    ['r','¡'+parts+'! ¡Fusión carpincha!'],['r','Juntas somos '+N+'. '+(R.c.length>2?'Tres poderes en un solo cuerpo.':'Dos poderes en un solo cuerpo.')],
-    ['c',['¿Otra fusión? ¿Cuántas combinaciones tienen?','Entonces voy a tener que rodar el doble.','Bueno... más hermanas, más mates.'][k]]];}
-  if(R.sup)return [['r',['¡Mirá mi forma súper! La luna me dio esta aura.','Volví más fuerte. Ahora soy '+N+'.','Súper aura encendida. Esta vez no te escapás.'][k]],
-    ['c',['Brillás lindo... pero los mates siguen siendo míos.','Súper o no, te gano igual.','Me encanta ese brillo. ¡Vamos!'][k]]];
-  return [['r',['¡Así que vos sos la famosa Cappy! Estos mates son míos.','¡Ese mate era mío! Lo vengo cebando desde que salió la luna.','Derrotaste a mis hermanas... pero yo soy la más rápida.','¿Así que vos sos la Cappy de la que todas hablan?'][i%4]],
-    ['c',['Tranqui, solo vine por los mates. Pero si querés pelea, vamos.','Estaba lavado igual. Lo arreglamos como carpinchas.','Eso lo vamos a ver. ¡Seguime el ritmo si podés!','La misma. ¿Arrancamos?'][i%4]]];}
-function bossWin(i){const R=RIVALS[LEVELS[i].rival];
-  if(R.fus)return [['r','La fusión... se deshace...'],['c','Igual son un gran equipo, chicas.']];
-  if(R.sup)return [['r','Mi aura súper se apagó...'],['c','Tranqui, con un mate calentito se te pasa.']];
-  return [['r','Está bien... ganaste. Llevate los mates.'],['c','¡Gracias! La próxima ronda la cebo yo.']];}
-function bossLose(i){const R=RIVALS[LEVELS[i].rival];return R.fus?(R.c.length>2?'Tres contra una... ¿lo intentás de nuevo?':'Dos cabezas piensan mejor que una. ¡Otra vez!'):R.sup?'El aura súper no perdona. ¡Levantate!':'¿Viste? Estos mates no se tocan.';}
+const BOSS_DLG=[
+{pre:[['r','Alto ahí, pelirroja. En esta catedral los mates los cebo yo.'],['c','¿Y vos quién sos?'],['r','Cappy Azul. Mi agua sale tan fría que congela el piso. ¡Cuidado con el hielo!'],['c','¿Agua fría para el mate? Eso es un crimen.']],
+ win:[['r','Me derretiste... nadie me había ganado.'],['c','Calentá el agua a 80 grados y hablamos.'],['r','Mis hermanas no van a ser tan buenas como yo.']],
+ lose:'El hielo siempre gana. ¡Volvé cuando te calientes!',rush:[['r','Otra vez vos. Esta vez traje el termo más frío del mundo.'],['c','Y yo traje ganas de revancha. ¡Dale!']]},
+{pre:[['r','¡Pisaste mi yerbal! Ahora vas a pisar mi barro.'],['c','Yo solo seguía el rastro de mates...'],['r','Cappy Verde, a tu servicio. Mi barro te va a frenar las patitas.'],['c','Mientras no me ensucies la pollera...']],
+ win:[['r','Uf... me quedé pegada en mi propio barro.'],['c','Pasa en las mejores familias.'],['r','Mi hermana Magenta te espera. Ojo: no vas a saber cuál es la verdadera.']],
+ lose:'¡Embarrada y derrotada! Andá a lavarte y volvé.',rush:[['r','¡Traje barro nuevo, recién hecho!'],['c','Qué asco... pero bueno, ¡vamos!']]},
+{pre:[['r','Hola, Cappy.'],['r','¿O debería decir... hola, hola y hola?'],['c','¿Por qué hay tres de vos?'],['r','Solo una es real. Si le pegás a una falsa, se esfuma. ¡Adiviná!']],
+ win:[['r','¿Cómo supiste cuál era yo?'],['c','Fácil: la única que se asustó.'],['r','Hmpf. Pasando el pantano, mi hermana Amarilla te va a dar una sorpresa eléctrica.']],
+ lose:'¡Te equivocaste de Magenta! Jiji.',rush:[['r','¿Cuántas Magentas ves hoy?'],['c','Las suficientes para ganarles a todas.']]},
+{pre:[['r','¡Bzzzt! Llegaste justo para la tormenta.'],['c','¿Vos sos la de los rayos?'],['r','Cappy Amarilla. Cuando caigo, el piso se electrifica. ¡Saltá o te despeinás!'],['c','Mi pelo ya viene despeinado de fábrica.']],
+ win:[['r','Me quedé sin batería...'],['c','Un mate te recarga, te lo juro.'],['r','Esto no terminó. Mis hermanas encontraron la luna del pantano...']],
+ lose:'¡Electrocutada! ¿Viste que había que saltar?',rush:[['r','¡Cargué las pilas para la revancha! ¡Bzzzt!'],['c','Yo también: termo lleno y patitas listas.']]},
+{pre:[['r','¿Te acordás de mí? Ahora soy Súper Cappy Azul.'],['c','Ese brillo azul es nuevo.'],['r','La luna del pantano me dio un aura. Mi hielo ahora congela el doble de rápido.'],['c','Entonces voy a rodar el doble de rápido.']],
+ win:[['r','Ni con el aura súper...'],['c','El aura te queda divina igual.'],['r','Verde también tomó la luz de la luna. Preparate.']],
+ lose:'¡Súper congelada! Ese termo tuyo ya está helado.',rush:[['r','Súper aura, súper hielo, súper revancha.'],['c','Y súper mates para festejar después.']]},
+{pre:[['r','El pantano es mi casa, y con el aura soy la reina del barro.'],['c','Súper Cappy Verde... ¿súper barro también?'],['r','Barro brillante. Te frena y encima te deja linda.'],['c','Lo último no me molesta.']],
+ win:[['r','Me hundí en mi propio pantano...'],['c','Te tiro una soga y un mate.'],['r','En el Castillo Helado, Magenta te espera... multiplicada.']],
+ lose:'Te quedaste pegada para siempre. Bueno, hasta que reintentes.',rush:[['r','Volví con barro de la mejor calidad.'],['c','Lo único de calidad acá es mi yerba.']]},
+{pre:[['r','Bienvenida al Castillo Helado. Somos... muchas.'],['c','Otra vez los clones. ¿Y ahora con aura?'],['r','Ahora mis copias también corren rápido. ¡Suerte encontrándome!'],['c','Te encuentro por el perfume de frutilla.']],
+ win:[['r','¡¿Por el perfume?! Me voy a cambiar de marca.'],['c','No, me encanta, dejalo.'],['r','La próxima es Súper Amarilla. Nunca la vi tan cargada.']],
+ lose:'¡Le pegaste a un reflejo en el hielo! Jaja.',rush:[['r','¿Sabés cuál de todas soy esta vez?'],['c','La que huele a frutilla. ¡Te tengo!']]},
+{pre:[['r','El hielo conduce perfecto la electricidad. ¡Elegiste mal el castillo!'],['c','Súper Cappy Amarilla... ¿rayos sobre hielo?'],['r','Rayos más rápidos, más fuertes y más amarillos.'],['c','Y yo más rodante que nunca.']],
+ win:[['r','Cortocircuito total...'],['c','Andá a enchufarte un ratito.'],['r','Cuidado... mis hermanas aprendieron a fusionarse.']],
+ lose:'Mil voltios y un termo vacío. ¡Mala combinación!',rush:[['r','Bzzzt al cuadrado. ¡Esta vez sí!'],['c','Mi termo es aislante. ¡Vamos!']]},
+{pre:[['r','¡Azul y Verde! ¡Fusión carpincha!'],['r','Somos una sola: hielo y barro en el mismo cuerpo.'],['c','¿Se pueden fusionar? ¿Desde cuándo?'],['r','Desde que nos ganaste por separado. A ver ahora, juntas.']],
+ win:[['r','La fusión... se deshace...'],['c','Igual hacen un gran equipo.'],['r','En las Ruinas de Fuego las fusiones son todavía más fuertes.']],
+ lose:'Hielo arriba, barro abajo. ¡No tenías escapatoria!',rush:[['r','Azul y Verde, otra vez juntas.'],['c','Y yo otra vez sola contra todas. Me gusta.']]},
+{pre:[['r','Clones de hielo en las Ruinas de Fuego. Qué ironía, ¿no?'],['c','El hielo se derrite acá, ¿sabían?'],['r','Por eso somos rápidas. ¡Fusión Azul y Magenta!'],['c','Bueno, rápido entonces.']],
+ win:[['r','Nos derretimos de verdad...'],['c','Les dejo agua fresquita para el camino.'],['r','Gracias... pero la próxima fusión trae rayos.']],
+ lose:'Te congelamos a vos y a tu sombra. ¡Todo frío!',rush:[['r','¿Hielo o clon? ¡Las dos cosas!'],['c','Rodar sirve para las dos. ¡Vamos!']]},
+{pre:[['r','¡Hielo y rayos! La tormenta perfecta.'],['c','¿En medio de un volcán? Ustedes están locas.'],['r','Locas por tus mates. ¡Entregá el termo!'],['c','Ni loca. El termo no se presta.']],
+ win:[['r','Un cortocircuito congelado... nunca nos pasó.'],['c','Siempre hay una primera vez.'],['r','Ojo con la siguiente: viene con escudo.']],
+ lose:'Congelada y electrocutada. ¡Combo perfecto!',rush:[['r','Volvimos con más voltaje y más frío.'],['c','Yo volví con más ganas.']]},
+{pre:[['r','Esta vez venimos con escudo, Cappy.'],['c','¿Verde y Magenta? ¿Barro y clones?'],['r','Primero rompé el escudo... si encontrás a la verdadera.'],['c','Me encantan los desafíos con instrucciones.']],
+ win:[['r','Ni el escudo nos salvó.'],['c','Un escudo no frena a una carpincha decidida.'],['r','Arriba, en las Nubes de Tormenta, te espera algo peor.']],
+ lose:'El escudo aguantó y vos no. ¡Otra vez!',rush:[['r','Escudo nuevo, barro nuevo, clones nuevos.'],['c','Y la misma Cappy de siempre.']]},
+{pre:[['r','¡Bienvenida a las nubes! Acá los rayos caen solos.'],['c','Y ustedes los ayudan, ¿no?'],['r','Barro eléctrico, Cappy. Lo inventamos nosotras.'],['c','Qué invento más feo.']],
+ win:[['r','Nuestro barro eléctrico... falló.'],['c','Patentalo igual, capaz se vende.'],['r','Magenta y Amarilla te esperan más arriba.']],
+ lose:'¡Pegada al barro y con rayos encima! Jaja.',rush:[['r','Barro eléctrico, versión 2.0.'],['c','Yo vengo en versión termo lleno.']]},
+{pre:[['r','Clones eléctricos con escudo. Elegí a cuál le tenés miedo.'],['c','A ninguna. Bueno... un poquito a los rayos.'],['r','Hacés bien. ¡Fusión Magenta y Amarilla!'],['c','Ahí vamos.']],
+ win:[['r','¿Cómo esquivaste todos los rayos?'],['c','Mucha práctica saltando charcos.'],['r','Ahora viene la triple fusión. Nadie le ganó nunca.']],
+ lose:'Le pegaste a la copia y el rayo te pegó a vos.',rush:[['r','Más clones, más rayos, más escudo.'],['c','Más ganas de ganar. ¡Dale!']]},
+{pre:[['r','¡Tres en una! ¡Azul, Verde y Magenta!'],['c','¿Ahora son tres? Esto se está yendo de las manos.'],['r','Hielo, barro y clones. ¿Por cuál empezás?'],['c','Por la que tenga el termo más lleno.']],
+ win:[['r','Ni siendo tres pudimos...'],['c','Son tres veces más simpáticas, eso sí.'],['r','Más allá del cielo, en la Galaxia del Mate, te espera el resto.']],
+ lose:'Tres contra una. Las cuentas no te daban.',rush:[['r','¡Vuelve la triple fusión!'],['c','¡Y vuelve la triple derrota!']]},
+{pre:[['r','Bienvenida a la Galaxia del Mate, donde nacen todas las yerbas.'],['c','Qué lugar hermoso para pelear... digo, para tomar mate.'],['r','Hielo, barro y rayos. ¡Ni las estrellas te van a ayudar!'],['c','Las estrellas siempre ayudan a las carpinchas.']],
+ win:[['r','Perdimos... entre las estrellas.'],['c','Igual es un lindo lugar para perder.'],['r','Quedan dos fusiones. La última es la más poderosa.']],
+ lose:'Te quedaste flotando en el espacio. ¡Volvé a la Tierra!',rush:[['r','Desde la galaxia, otra vez a pelear.'],['c','Yo vengo desde el fondo del termo. ¡Vamos!']]},
+{pre:[['r','Clones congelados que tiran rayos. Linda combinación, ¿no?'],['c','Peligrosa, más bien.'],['r','Somos la penúltima. ¿Te quedan termos?'],['c','Los suficientes. Y Don Cappur de reserva.']],
+ win:[['r','¿Bizcochos como escudo? Eso es trampa.'],['c','Es estrategia argentina.'],['r','La última fusión te espera: Verde, Magenta y Amarilla. La más fuerte.']],
+ lose:'Esta vez ni los bizcochos te salvaron.',rush:[['r','La penúltima vuelve por revancha.'],['c','Y se va con otra derrota.']]},
+{pre:[['r','Llegaste al final, Cappy. Somos la última fusión.'],['c','Después de tantas Cappys... ¿qué quieren de verdad?'],['r','Saber si sos digna del Termo Mayor. Barro, clones y rayos: ¡todo junto!'],['c','Entonces vamos con todo. ¡Por el mate!']],
+ win:[['r','Sos digna... la más digna de todas.'],['c','¿Ahora sí, una ronda de mates todas juntas?'],['r','Sí... pero dicen que existe alguien más fuerte que todas nosotras.']],
+ lose:'Todavía no sos digna del Termo Mayor. ¡Intentalo de nuevo!',rush:[['r','La última fusión, una vez más.'],['c','Y yo, un paso más cerca de la Arcoíris.']]}];
+const OSCURA_RUSH=[['r','La oscuridad no olvida. ¿Revancha en el torneo?'],['c','Traje luz de sobra. ¡Vamos!']];
+function bossDlg(i){return BOSS_DLG[i].pre;}
+function bossWin(i){return BOSS_DLG[i].win;}
+function bossLose(i){return BOSS_DLG[i].lose;}
 (function(){const dD=DIALOG[DIALOG.length-1],dW=WIN_TALK[WIN_TALK.length-1],dL=LOSE_TALK[LOSE_TALK.length-1];
   DIALOG.length=0;WIN_TALK.length=0;LOSE_TALK.length=0;
   for(let i=0;i<NMAIN;i++){DIALOG.push(bossDlg(i));WIN_TALK.push(bossWin(i));LOSE_TALK.push(bossLose(i));}
@@ -1117,7 +1172,7 @@ let termoLostT=0, MAXT=9, shakeT=0, papas=null, cappur=0, flame=0, gfires=[];
 const NEED_RUSH=NMAIN;
 function rushSetup(i){const r=RUSH[i],L=LEVELS[RUSH_LV],RV=RIVALS[r[0]];
   Object.assign(L,{rival:r[0],hp:r[1],diff:r[2],bshield:r[3],aura:(RV.sup||RV.rainbow)?1:0,phases:r[4],phaseTalk:RV.rainbow?['¡Todos los colores a la vez! ¿Podés con eso?','¡Último arcoíris! ¡Sentí el poder de todas las Cappys!']:RV.dark?LEVELS[NMAIN].phaseTalk:null});
-  const src=r[5];if(src>=0){DIALOG[RUSH_LV]=DIALOG[src];WIN_TALK[RUSH_LV]=WIN_TALK[src];LOSE_TALK[RUSH_LV]=LOSE_TALK[src];}
+  const src=r[5];if(src>=0){const D=src<NMAIN?BOSS_DLG[src]:null;DIALOG[RUSH_LV]=D?D.rush:OSCURA_RUSH;WIN_TALK[RUSH_LV]=[D?D.win[0]:WIN_TALK[src][0],['c',['¡Que pase la siguiente!','Una menos. ¡Sigo!','Esto recién empieza.','¡Termo arriba y a la próxima!'][i%4]]];LOSE_TALK[RUSH_LV]=D?D.lose:LOSE_TALK[src];}
   else{DIALOG[RUSH_LV]=[['r','Llegaste hasta mí. Soy Cappy Arcoíris: tengo el poder de todas.'],['c','Entonces vengo a tomar mate con todas a la vez.'],['r','¡Hielo, barro, clones, rayos y oscuridad! ¡Preparate!']];
     WIN_TALK[RUSH_LV]=[['r','Increíble... ningún color pudo con vos.'],['c','No es el color, es el termo lleno. ¿Un mate?'],['r','Uno solo... y la revancha.']];
     LOSE_TALK[RUSH_LV]='Todos los colores juntos son demasiado para una sola Cappy.';}
@@ -1717,7 +1772,7 @@ function render(){
     if(TL.length>1)for(const b of TL)drawBtn(b,b.label,b.col);
     else if(Math.floor(timeF/30)%2)hudText(IS_PC?'Enter o Z para empezar':'Tocá para empezar',W/2,335,16,'center','#ffd0dc');
     if(SAVE.wallet)hudText('🧉 Billetera: '+SAVE.wallet,W/2,196,13,'center','#9be05a');
-    const ng=SAVE.gold?Object.keys(SAVE.gold).length:0;if(ng)hudText('✦ Termos dorados: '+ng+'/'+NMAIN,W/2,176,13,'center','#ffd23a');
+    const ng=SAVE.gold?Object.keys(SAVE.gold).length:0;if(ng||SAVE.done)hudText('✦ Termos dorados: '+ng+'/'+NMAIN+(ng<NMAIN?' · con 18 se abre el Área 7':''),W/2,176,13,'center','#ffd23a');
   } else if(state==='vn'){/* drawn later */
   } else if(state==='select'){drawSelect();
   } else {
@@ -1775,7 +1830,7 @@ function anyTap(){
     if(inBtn(B.no)){state='over';return;}
     contT=Math.max(1,contT-30);return;}
   if(state==='over'){state=single===1?'select':'title';musCur=null;return;}
-  if(state==='win'&&winT>140){if(single===2){state='title';musCur=null;}else if(single){state='select';musCur=null;}else if(LV<NMAIN-1){const nx=LV+1;playVN(VN.end[LV].concat(VN.start[nx]||[]),()=>{LV=nx;startLevel();});}else{playVN(VN.end[LV],()=>{state='title';musCur=null;});}prevJ.v=1;}
+  if(state==='win'&&winT>140){if(single===2){state='title';musCur=null;}else if(single){state='select';musCur=null;}else if(LV<NMAIN-1){LV=LV+1;startLevel();}else{playVN(endingLines(),()=>{state='title';musCur=null;});}prevJ.v=1;}
 }
 
 let last=performance.now(),accu=0;
