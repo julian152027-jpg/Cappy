@@ -698,11 +698,11 @@ function bossStep(){
   if(state!=='play'||((b.mode==='enter'||b.mode==='fuse')&&!talkDone))return;
   if(P.dead||b.hit)return;
   const by=b.y-(b.ball?22:26), dx=P.x-b.x, dy=(P.y-ph/2)-by;
-  if(Math.abs(dx)<26&&Math.abs(dy)<20+ph/2){
+  if(Math.abs(dx)<26+(P.fd?10:0)&&Math.abs(dy)<20+ph/2+(P.fd?26:0)){
     const stomp=!P.ground&&P.vy>0&&P.y<by;
-    if(((P.ball&&(!b.ball||stomp))||P.starT)&&b.shield){b.shield=0;b.hit=50;shakeT=8;beep('hurt');for(let k=0;k<16;k++)puff(b.x,by,1,'#8ef');pops.push({x:b.x,y:by-50,txt:'¡Escudo roto!',t:0});
+    if(((P.ball&&(!b.ball||stomp||P.fd))||P.starT)&&b.shield){b.shield=0;b.hit=50;shakeT=8;beep('hurt');for(let k=0;k<16;k++)puff(b.x,by,1,'#8ef');pops.push({x:b.x,y:by-50,txt:'¡Escudo roto!',t:0});
       P.vx=(dx<0?-1:1)*4;P.vy=-5.5;P.ground=null;P.ball=1;P.jumping=0;}
-    else if((P.ball&&(!b.ball||stomp))||P.starT){b.hp--;shakeT=10;b.hit=70;beep('bosshit');puff(b.x,by,10,'#fff');addPts(100,b.x,by-30);
+    else if((P.ball&&(!b.ball||stomp||P.fd))||P.starT){b.hp--;shakeT=10;b.hit=70;beep('bosshit');puff(b.x,by,10,'#fff');addPts(100,b.x,by-30);
       P.vx=(dx<0?-1:1)*3.5;P.vy=-5.5;P.ground=null;P.ball=1;P.jumping=0;
       b.vx=-(dx<0?-1:1)*3;b.vy=-4;b.ground=0;b.landed=0;b.ball=0;bossSet('hurt');}
     else if(P.ball&&b.ball){const s=dx<0?-1:1;P.vx=s*4.5;P.vy=-4.5;P.ground=null;b.vx=-s*Math.max(3,Math.abs(b.vx)*.6);beep('pop');}
@@ -754,7 +754,7 @@ const OUTFITS=[{id:'clasico',name:'Clásico',price:0,col:null},
   {id:'marinera',name:'Marinera',price:200,col:[50,70,150],acc:'marinera'},{id:'vampira',name:'Vampira',price:250,col:[150,12,32],acc:'murci'},
   {id:'bruja',name:'Bruja',price:280,col:[120,60,170],acc:'bruja'},{id:'navidad',name:'Navidad',price:280,col:[200,24,34],acc:'gorro'},
   {id:'reina',name:'Reina',price:400,col:[230,180,40],acc:'corona'}];
-const SHOP_ITEMS=[{id:'cappur',name:'Don Cappur',price:50,sub:'termo extra que se usa primero'},{id:'capper',name:'Capper',price:40,sub:'velocidad 15 s'},{id:'termo',name:'+1 Termo',price:70,sub:'hasta perder una vida'},{id:'papas',name:'Cappapas',price:120,sub:'rodás en llamas hasta un golpe'},{id:'vida',name:'+1 Vida',price:150,sub:'una Cappy más'}];
+const SHOP_ITEMS=[{id:'cappur',name:'Don Cappur',price:50,sub:'termo extra que se usa primero'},{id:'capper',name:'Capper',price:40,sub:'velocidad 15 s'},{id:'termo',name:'+1 Termo',price:70,sub:'hasta perder una vida'},{id:'papas',name:'Cappapas',price:120,sub:'escudo de fuego y golpe en el aire'},{id:'vida',name:'+1 Vida',price:150,sub:'una Cappy más'}];
 const outfitSheets={};const HEAD={"0":[57,44,96],"1":[58,44,97],"2":[57,43,97],"3":[57,44,97],"4":[58,43,96],"5":[58,44,97],"6":[58,44,96],"7":[57,46,97],"8":[57,44,96],"9":[58,45,96],"10":[58,45,96],"11":[57,44,96],"12":[59,43,100],"13":[58,41,100],"14":[59,42,95],"15":[59,44,98],"16":[60,44,99],"17":[59,44,99],"18":[60,46,97],"19":[59,46,97],"20":[61,45,100],"21":[63,47,101],"22":[58,45,98],"23":[63,46,100],"24":[61,43,101],"25":[60,45,99],"26":[61,45,100],"27":[61,49,100],"28":[63,52,102],"29":[62,49,101],"30":[64,51,101],"31":[63,52,100],"32":[64,53,103],"33":[65,54,102],"34":[65,54,102],"35":[65,50,102],"36":[60,49,102],"37":[59,48,100],"38":[61,48,102],"39":[58,46,102],"40":[59,47,101],"41":[60,48,97],"42":[60,47,101],"43":[59,47,101],"44":[60,47,102],"45":[63,53,102],"46":[64,52,104],"47":[60,49,102],"48":[62,51,100],"49":[61,51,99],"50":[62,52,100],"51":[61,52,101],"52":[63,53,101],"53":[61,55,101],"54":[62,56,100],"55":[62,56,101],"56":[68,54,108],"57":[65,56,102],"58":[68,54,106],"59":[60,52,101],"60":[54,55,92],"61":[61,56,99],"62":[62,58,100],"63":[64,57,102],"64":[63,57,102],"65":[64,55,102],"66":[59,54,90],"67":[60,54,98],"68":[59,54,97],"69":[60,53,98],"70":[59,53,98],"71":[65,78,92],"72":[58,52,94],"73":[61,51,95],"74":[60,52,100],"75":[58,54,97],"76":[60,57,99],"77":[61,61,97],"80":[59,58,100],"81":[58,58,99],"82":[58,56,99],"83":[58,57,99],"84":[60,56,95],"85":[60,55,96],"86":[59,58,92],"87":[60,55,90],"88":[64,58,98],"89":[68,74,99],"90":[61,53,94],"91":[60,53,96],"92":[57,53,97],"93":[60,52,95],"94":[59,53,95],"95":[59,52,95],"96":[60,52,95],"97":[58,52,95],"98":[60,52,94],"99":[57,52,94],"100":[58,51,95],"101":[59,51,95],"102":[59,52,95],"103":[59,51,94],"104":[57,52,94],"105":[57,51,93],"106":[59,51,95],"107":[59,51,95]};
 function makeOutfitSheets(){
   const c0=document.createElement('canvas');c0.width=img.width;c0.height=img.height;const g0=c0.getContext('2d');g0.drawImage(img,0,0);
@@ -1129,26 +1129,28 @@ function rushNext(){rushIdx++;rushSetup(rushIdx);termos=Math.max(3,termos);addPt
 function dropGold(x,y){if(LV>=NMAIN||gold)return;let gx=x,g=groundTop(gx);if(g>1e8){gx=P.x+P.face*40;g=groundTop(gx);}if(g>1e8){gx=P.x;g=P.y;}
   gold={x:gx,y:Math.min(y,g-34),gy:g-34,vy:-5,got:0};toastT=220;toastMsg='¡Todos vencidos! Apareció un termo dorado';setTimeout(()=>beep('win'),150);}
 function checkAllClear(x,y){if(enemies.length&&enemies.every(e=>!e.alive))dropGold(x,y);}
-function eatPapas(){flame=1;toastT=220;toastMsg='¡Cappapas! Rodá envuelta en llamas';beep('win');}
+function eatPapas(){flame=1;toastT=220;toastMsg='¡Cappapas! En el aire, saltá otra vez: ¡golpe de fuego!';beep('win');}
 function flameTongue(x,y,w,h,lean,c1,c2){ctx.fillStyle=c1;ctx.beginPath();ctx.moveTo(x-w,y);ctx.bezierCurveTo(x-w,y-h*.45,x+lean-w*.3,y-h*.7,x+lean,y-h);ctx.bezierCurveTo(x+lean+w*.3,y-h*.7,x+w,y-h*.45,x+w,y);ctx.quadraticCurveTo(x,y+w*.6,x-w,y);ctx.fill();
   if(c2){const w2=w*.5,h2=h*.55;ctx.fillStyle=c2;ctx.beginPath();ctx.moveTo(x-w2,y);ctx.bezierCurveTo(x-w2,y-h2*.5,x+lean*.5-w2*.3,y-h2*.7,x+lean*.5,y-h2);ctx.bezierCurveTo(x+lean*.5+w2*.3,y-h2*.7,x+w2,y-h2*.5,x+w2,y);ctx.closePath();ctx.fill();}}
 const fireSheets={};
 function fireSheet(){const k=SAVE.outfit||'clasico';if(fireSheets[k])return fireSheets[k];const s=pSheet();if(!s.width)return s;const c=document.createElement('canvas');c.width=s.width;c.height=s.height;const g=c.getContext('2d');
   g.drawImage(s,0,0);g.globalCompositeOperation='source-atop';g.fillStyle='rgba(255,30,10,.38)';g.fillRect(0,0,c.width,c.height);return fireSheets[k]=c;}
-function drawFlameBack(){const rl=P.roll||P.dash||P.ball,cy=P.y-(rl?22:26),t=timeF,dir=Math.sign(P.gs||P.vx||0)||P.face;
-  drawGlow(P.x,cy,(rl?64:52)+Math.sin(t*.35)*5,'rgba(255,25,10,.9)');drawGlow(P.x,cy,(rl?40:32)+Math.sin(t*.5)*3,'rgba(255,120,30,.8)',.8);
+function drawFlameBack(){const rl=P.roll||P.dash||P.ball,cy=P.y-(rl?22:26),t=timeF,dash=P.fd>0,d=P.face;
+  drawGlow(P.x,cy,(dash?70:56)+Math.sin(t*.35)*5,'rgba(255,25,10,.9)');
   ctx.save();ctx.globalCompositeOperation='lighter';
-  if(rl){const sp=Math.min(1,Math.abs(P.gs||P.vx||0)/8);for(let k=0;k<6;k++){const ph=(t*.7+k*1.7)%6.283,tx=P.x-dir*(14+k*7)*(.4+sp),ty=cy+Math.sin(ph)*8;
-      ctx.globalAlpha=.75-k*.1;flameTongue(tx,ty+10,9-k*.8,26+((t+k*7)%9)-k*2,-dir*(10+sp*16),'rgba(255,60,20,.9)','rgba(255,210,80,.9)');}}
-  else{for(let k=0;k<5;k++){const ox=(k-2)*10,h=34+Math.sin(t*.45+k*1.9)*7+(k===2?10:0);ctx.globalAlpha=.55;flameTongue(P.x+ox,P.y+2,8,h,Math.sin(t*.2+k)*5,'rgba(255,40,15,.85)','rgba(255,170,50,.85)');}}
+  if(dash){for(let k=0;k<7;k++){const tx=P.x-d*(8+k*9),h=30-k*3;ctx.globalAlpha=.8-k*.09;flameTongue(tx,cy+12+Math.sin(t*.9+k)*3,12-k,h,-d*(22+k*2),'rgba(255,50,15,.9)','rgba(255,220,100,.95)');}}
+  // llamas que suben desde la burbuja (escudo de fuego)
+  for(let k=0;k<6;k++){const ph=k/6*6.283+t*.15,ox=Math.cos(ph)*22,h=24+Math.sin(t*.5+k*1.3)*8+(Math.abs(ox)<10?10:0),lean=dash?-d*14:(Math.sin(t*.25+k)*5-(P.vx||0)*2);
+    ctx.globalAlpha=.65;flameTongue(P.x+ox,cy-6+Math.abs(Math.sin(ph))*6,9,h+14,lean,'rgba(255,45,15,.85)','rgba(255,190,60,.9)');}
   ctx.restore();ctx.globalAlpha=1;}
-function drawFlameFront(){const rl=P.roll||P.dash||P.ball,cy=P.y-(rl?22:26),t=timeF,dir=Math.sign(P.gs||P.vx||0)||P.face;
-  ctx.save();ctx.globalCompositeOperation='lighter';
-  if(rl){for(let k=0;k<8;k++){const a=k/8*6.283+t*.3,rr=17,fx=P.x+Math.cos(a)*rr,fy=cy+Math.sin(a)*rr+6,h=16+((t*2+k*5)%8);ctx.globalAlpha=.6;flameTongue(fx,fy,6,h,-dir*8,'rgba(255,70,20,.85)','rgba(255,230,120,.9)');}
-    ctx.globalAlpha=.5;ctx.fillStyle='rgba(255,200,90,.5)';ctx.beginPath();ctx.arc(P.x,cy,15,0,7);ctx.fill();}
-  else{for(let k=0;k<3;k++){const ox=(k-1)*13,h=18+Math.sin(t*.6+k*2.3)*5;ctx.globalAlpha=.45;flameTongue(P.x+ox,P.y+2,6,h,Math.sin(t*.3+k)*4,'rgba(255,50,20,.8)','rgba(255,200,80,.8)');}}
+function drawFlameFront(){const rl=P.roll||P.dash||P.ball,cy=P.y-(rl?22:26),t=timeF,dash=P.fd>0,d=P.face;
+  ctx.save();const R0=dash?34:30,sx=dash?1.25:1;ctx.translate(P.x,cy);ctx.scale(sx,1/sx>.85?1/sx:1);
+  const g=ctx.createRadialGradient(0,0,R0*.3,0,0,R0);g.addColorStop(0,'rgba(255,220,120,.10)');g.addColorStop(.7,'rgba(255,90,20,.22)');g.addColorStop(1,'rgba(255,40,10,.55)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,R0+Math.sin(t*.4)*1.5,0,7);ctx.fill();
+  ctx.globalCompositeOperation='lighter';ctx.strokeStyle='rgba(255,140,40,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,R0,0,7);ctx.stroke();
+  for(let k=0;k<5;k++){const a=t*.12+k*1.256,x1=Math.cos(a)*R0*.8,y1=Math.sin(a)*R0*.8;ctx.globalAlpha=.5;flameTongue(x1,y1+5,5,13+((t+k*7)%6),dash?-d*10:0,'rgba(255,90,20,.8)','rgba(255,230,140,.9)');}
   ctx.restore();ctx.globalAlpha=1;
-  if(t%3===0)parts.push({x:P.x+(Math.random()-.5)*30,y:cy+(Math.random()-.2)*20,vx:(Math.random()-.5)*.6-dir*(rl?1.2:0),vy:-1.2-Math.random(),t:0,life:26,col:['#ff2a10','#ff7a1a','#ffd23a'][(t/3|0)%3]});}
+  if(t%3===0)parts.push({x:P.x+(Math.random()-.5)*34,y:cy-10-Math.random()*14,vx:(Math.random()-.5)*.6,vy:-1.4-Math.random(),t:0,life:24,col:['#ff2a10','#ff7a1a','#ffd23a'][(t/3|0)%3]});}
 function loseFlame(){if(flame){flame=0;pops.push({x:P.x,y:P.y-80,txt:'¡Se fueron las Cappapas!',t:0});}}
 function drawCapper(x,y,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);
   ctx.fillStyle='#111';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-8,-18,16,36,3);else ctx.rect(-8,-18,16,36);ctx.fill();
@@ -1230,11 +1232,16 @@ function step(){
       if(inp.R){P.vx=Math.min(Math.max(P.vx,TOP),P.vx+AIR);P.face=1;}
       if(inp.L){P.vx=Math.max(Math.min(P.vx,-TOP),P.vx-AIR);P.face=-1;}
       if(P.coy>0&&jbuf>0&&!P.jumping){jbuf=0;P.coy=0;P.vy=-JUMP;P.ball=1;P.jumping=1;P.roll=0;beep('jump');}
+      if(flame&&inp.Jp&&!P.fdUsed&&(P.jumping||P.ball)&&!P.loop){const d=inp.R?1:inp.L?-1:P.face;P.face=d;P.fd=22;P.fdUsed=1;P.vx=d*11.5;P.vy=0;P.ball=1;P.jumping=0;jbuf=0;shakeT=5;beep('dash');
+        for(let k=0;k<14;k++)parts.push({x:P.x-d*10,y:P.y-22+(Math.random()-.5)*24,vx:-d*(1+Math.random()*3),vy:(Math.random()-.5)*1.5,t:0,life:22,col:['#ff2a10','#ff7a1a','#ffd23a'][k%3]});}
       if(P.jumping&&!inp.J&&P.vy<-4)P.vy=-4;
       if(P.vy<0&&P.vy>-4)P.vx*=.985;
     }
-    P.vy=Math.min(P.vy+GRAV,14);
+    if(P.fd>0){P.fd--;if(P.fd>8){P.vy=0;P.vx=Math.sign(P.vx||P.face)*11.5;}else P.vy=Math.min(P.vy+GRAV,14);
+      parts.push({x:P.x-P.face*14,y:P.y-22+(Math.random()-.5)*18,vx:-P.face*2,vy:-.4,t:0,life:18,col:['#ff2a10','#ff7a1a','#ffd23a'][timeF%3]});}
+    else P.vy=Math.min(P.vy+GRAV,14);
   }
+  if(P.ground){P.fdUsed=0;P.fd=0;}
   if(!P.loop){stepMove();
     if(P.ground&&!P.dead){
       for(const l of loops)if(P.gs>=5&&px0<l.cx&&P.x>=l.cx&&Math.abs(P.y-l.gy)<4){P.loop={l,th:0,spd:P.gs};P.x=l.cx;P.y=l.gy;beep('dash');}
@@ -1244,7 +1251,7 @@ function step(){
   // poder de fuego
   if(fireCd)fireCd--;
   const rolling=(P.roll||P.dash||(P.ball&&P.ground))&&!P.dead;
-  if(flame&&rolling&&fireCd===0&&Math.abs(P.gs||P.vx)>1.2&&P.ground){const d=Math.sign(P.gs||P.vx||P.face);gfires.push({x:P.x+d*16,y:P.y,vx:d*(7+Math.min(4,Math.abs(P.gs||0)*.3)),t:0,hitB:0});fireCd=26;beep('dash');}
+  if(false&&flame&&rolling&&fireCd===0){const d=Math.sign(P.gs||P.vx||P.face);gfires.push({x:P.x+d*16,y:P.y,vx:d*(7+Math.min(4,Math.abs(P.gs||0)*.3)),t:0,hitB:0});fireCd=26;beep('dash');}
   for(const f of gfires){f.t++;f.x+=f.vx;const g=groundTop(f.x);if(g>1e8||Math.abs(g-f.y)>40)f.dead=1;else f.y=g;if(f.t>70)f.dead=1;
     if(f.t%3===0)puff(f.x,f.y-6,1,f.t%2?'#ff8a1a':'#ffd23a');
     for(const e of enemies){if(!e.alive)continue;const ey=(e.x1!==undefined)?e.y-20:e.y;if(Math.abs(e.x-f.x)<20&&Math.abs(ey-(f.y-14))<34){e.alive=0;puff(e.x,ey,10,'#f84');addPts(200,e.x,ey-20);checkAllClear(e.x,ey);}}
@@ -1322,8 +1329,8 @@ function step(){
       if(e.cd<=0&&d<380&&!P.dead){e.cd=150;const sp=2.4;hearts.push({x:e.x+e.face*10,y:e.y,vx:dx/d*sp,vy:dy/d*sp,t:0});beep('rev');}}
     else {e.ph+=.03;e.x=e.bx+Math.sin(e.ph)*60;e.y=e.by+Math.sin(e.ph*2)*18;}
     const ey=(e.t==='skull'||e.t==='zombie'||e.t==='spiky')?e.y-20:e.y;
-    if(Math.abs(e.x-P.x)<22&&Math.abs(ey-(P.y-ph/2))<ph/2+12){
-      const attacking=e.t==='spiky'?(P.starT||((P.roll||P.dash)&&P.ground)):(P.starT||P.ball||P.dash||(!P.ground&&P.vy>0&&P.y<ey));
+    if(Math.abs(e.x-P.x)<22+(P.fd?10:0)&&Math.abs(ey-(P.y-ph/2))<ph/2+12+(P.fd?20:0)){
+      const attacking=e.t==='spiky'?(P.starT||P.fd||((P.roll||P.dash)&&P.ground)):(P.starT||P.ball||P.dash||(!P.ground&&P.vy>0&&P.y<ey));
       if(e.t==='spiky'&&!attacking&&!P.ground&&P.y<ey){hurtPlayer();P.vy=-6;continue;}
       if(attacking){e.alive=0;puff(e.x,ey,10,'#b9a');if(e.t==='spiky')spikyTaught=1;checkAllClear(e.x,ey);beep('pop');
         const c=P.chain||0;addPts([100,200,500,1000][Math.min(c,3)],e.x,ey-20);P.chain=c+1;
