@@ -761,7 +761,7 @@ const OUTFITS=[{id:'clasico',name:'Clásico',price:0,col:null},
   {id:'marinera',name:'Marinera',price:200,col:[50,70,150],acc:'marinera'},{id:'vampira',name:'Vampira',price:250,col:[150,12,32],acc:'murci'},
   {id:'bruja',name:'Bruja',price:280,col:[120,60,170],acc:'bruja'},{id:'navidad',name:'Navidad',price:280,col:[200,24,34],acc:'gorro'},
   {id:'reina',name:'Reina',price:400,col:[230,180,40],acc:'corona'}];
-const SHOP_ITEMS=[{id:'cappur',name:'Don Cappur',price:50,sub:'termo extra que se usa primero'},{id:'capper',name:'Capper',price:40,sub:'velocidad 15 s'},{id:'termo',name:'+1 Termo',price:70,sub:'hasta perder una vida'},{id:'papas',name:'Cappapas',price:120,sub:'escudo de fuego y golpe en el aire'},{id:'vida',name:'+1 Vida',price:150,sub:'una Cappy más'}];
+const SHOP_ITEMS=[{id:'cappur',name:'Lunitas',price:50,sub:'termo extra que se usa primero'},{id:'capper',name:'Rayito',price:40,sub:'velocidad 15 s'},{id:'termo',name:'+1 Termo',price:70,sub:'hasta perder una vida'},{id:'papas',name:'Fueguitas',price:120,sub:'escudo de fuego y golpe en el aire'},{id:'vida',name:'+1 Vida',price:150,sub:'una Cappy más'}];
 const outfitSheets={};const HEAD={"0":[57,44,96],"1":[58,44,97],"2":[57,43,97],"3":[57,44,97],"4":[58,43,96],"5":[58,44,97],"6":[58,44,96],"7":[57,46,97],"8":[57,44,96],"9":[58,45,96],"10":[58,45,96],"11":[57,44,96],"12":[59,43,100],"13":[58,41,100],"14":[59,42,95],"15":[59,44,98],"16":[60,44,99],"17":[59,44,99],"18":[60,46,97],"19":[59,46,97],"20":[61,45,100],"21":[63,47,101],"22":[58,45,98],"23":[63,46,100],"24":[61,43,101],"25":[60,45,99],"26":[61,45,100],"27":[61,49,100],"28":[63,52,102],"29":[62,49,101],"30":[64,51,101],"31":[63,52,100],"32":[64,53,103],"33":[65,54,102],"34":[65,54,102],"35":[65,50,102],"36":[60,49,102],"37":[59,48,100],"38":[61,48,102],"39":[58,46,102],"40":[59,47,101],"41":[60,48,97],"42":[60,47,101],"43":[59,47,101],"44":[60,47,102],"45":[63,53,102],"46":[64,52,104],"47":[60,49,102],"48":[62,51,100],"49":[61,51,99],"50":[62,52,100],"51":[61,52,101],"52":[63,53,101],"53":[61,55,101],"54":[62,56,100],"55":[62,56,101],"56":[68,54,108],"57":[65,56,102],"58":[68,54,106],"59":[60,52,101],"60":[54,55,92],"61":[61,56,99],"62":[62,58,100],"63":[64,57,102],"64":[63,57,102],"65":[64,55,102],"66":[59,54,90],"67":[60,54,98],"68":[59,54,97],"69":[60,53,98],"70":[59,53,98],"71":[65,78,92],"72":[58,52,94],"73":[61,51,95],"74":[60,52,100],"75":[58,54,97],"76":[60,57,99],"77":[61,61,97],"80":[59,58,100],"81":[58,58,99],"82":[58,56,99],"83":[58,57,99],"84":[60,56,95],"85":[60,55,96],"86":[59,58,92],"87":[60,55,90],"88":[64,58,98],"89":[68,74,99],"90":[61,53,94],"91":[60,53,96],"92":[57,53,97],"93":[60,52,95],"94":[59,53,95],"95":[59,52,95],"96":[60,52,95],"97":[58,52,95],"98":[60,52,94],"99":[57,52,94],"100":[58,51,95],"101":[59,51,95],"102":[59,52,95],"103":[59,51,94],"104":[57,52,94],"105":[57,51,93],"106":[59,51,95],"107":[59,51,95]};
 function makeOutfitSheets(){
   const c0=document.createElement('canvas');c0.width=img.width;c0.height=img.height;const g0=c0.getContext('2d');g0.drawImage(img,0,0);
@@ -891,9 +891,9 @@ function shopTap(){for(const b of shopBtns()){if(!inBtn(b))continue;
   if(b.kind==='adm'){cgAd('rewarded',()=>{SAVE.wallet=(SAVE.wallet||0)+100;saveGame();shopMsg='¡Gracias por mirar! +100 mates.';beep('win');},ok=>{if(!ok)shopMsg='No hay anuncios disponibles ahora. Probá en un rato.';});return;}
   const it=b.it,w=avail();
   if(b.kind==='item'){if(w<it.price){shopMsg='Te faltan '+(it.price-w)+' mates. ¡Seguí juntando!';beep('hurt');return;}
-    if(it.id==='cappur'){if(cappur>=5){shopMsg='Ya tenés 5 paquetes de Don Cappur, ¡no te entran más!';return;}cappur++;}
+    if(it.id==='cappur'){if(cappur>=5){shopMsg='Ya tenés 5 paquetes de Lunitas, ¡no te entran más!';return;}cappur++;}
     if(it.id==='capper')P.speedT=900;
-    if(it.id==='papas'){if(flame){shopMsg='Ya tenés Cappapas. Te duran hasta que te golpeen.';return;}flame=1;}
+    if(it.id==='papas'){if(flame){shopMsg='Ya tenés Fueguitas. Te duran hasta que te golpeen.';return;}flame=1;}
     if(it.id==='vida')lives++;
     if(it.id==='termo'){if(termos>=MAXT){shopMsg='Ya tenés el máximo de termos ('+MAXT+').';return;}termos++;}
     spend(it.price);shopMsg='¡Gracias! '+it.name+': '+it.sub+'.';beep('rosa');return;}
@@ -1073,7 +1073,7 @@ const BOSS_DLG=[
 {pre:[['r','Bienvenida a la Galaxia del Mate, donde nacen todas las yerbas.'],['c','Qué lugar hermoso para pelear... digo, para tomar mate.'],['r','Hielo, barro y rayos. ¡Ni las estrellas te van a ayudar!'],['c','Las estrellas siempre ayudan a las carpinchas.']],
  win:[['r','Perdimos... entre las estrellas.'],['c','Igual es un lindo lugar para perder.'],['r','Quedan dos fusiones. La última es la más poderosa.']],
  lose:'Te quedaste flotando en el espacio. ¡Volvé a la Tierra!',rush:[['r','Desde la galaxia, otra vez a pelear.'],['c','Yo vengo desde el fondo del termo. ¡Vamos!']]},
-{pre:[['r','Clones congelados que tiran rayos. Linda combinación, ¿no?'],['c','Peligrosa, más bien.'],['r','Somos la penúltima. ¿Te quedan termos?'],['c','Los suficientes. Y Don Cappur de reserva.']],
+{pre:[['r','Clones congelados que tiran rayos. Linda combinación, ¿no?'],['c','Peligrosa, más bien.'],['r','Somos la penúltima. ¿Te quedan termos?'],['c','Los suficientes. Y Lunitas de reserva.']],
  win:[['r','¿Bizcochos como escudo? Eso es trampa.'],['c','Es estrategia argentina.'],['r','La última fusión te espera: Verde, Magenta y Amarilla. La más fuerte.']],
  lose:'Esta vez ni los bizcochos te salvaron.',rush:[['r','La penúltima vuelve por revancha.'],['c','Y se va con otra derrota.']]},
 {pre:[['r','Llegaste al final, Cappy. Somos la última fusión.'],['c','Después de tantas Cappys... ¿qué quieren de verdad?'],['r','Saber si sos digna del Termo Mayor. Barro, clones y rayos: ¡todo junto!'],['c','Entonces vamos con todo. ¡Por el mate!']],
@@ -1171,7 +1171,7 @@ let TOP=TOP0, ACC=ACC0;
 function hurtPlayer(){
   if(P.inv||P.dead||P.starT)return;
   loseFlame();
-  if(cappur>0){cappur--;termoLostT=0;pops.push({x:P.x,y:P.y-70,txt:'-1 Don Cappur',t:0});P.inv=120;P.hurt=1;P.ground=null;P.ball=0;P.roll=0;P.loop=null;P.vy=-4.5;P.vx=-P.face*2.2;beep('hurt');puff(P.x,P.y-24,12,'#e0a85a');return;}
+  if(cappur>0){cappur--;termoLostT=0;pops.push({x:P.x,y:P.y-70,txt:'-1 Lunitas',t:0});P.inv=120;P.hurt=1;P.ground=null;P.ball=0;P.roll=0;P.loop=null;P.vy=-4.5;P.vx=-P.face*2.2;beep('hurt');puff(P.x,P.y-24,12,'#e0a85a');return;}
   if(P.shield){P.shield=0;P.inv=90;P.hurt=1;P.ground=null;P.ball=0;P.roll=0;P.vy=-4.5;P.vx=-P.face*2.2;beep('hurt');puff(P.x,P.y-24,12,'#8ef');return;}
   termos--; termoLostT=40; shakeT=14;
   if(termos>0){P.hurt=1; P.inv=150; P.ground=null; P.ball=0; P.roll=0; P.loop=null; P.vy=-4.5; P.vx=-P.face*2.2; beep('hurt');puff(P.x,P.y-30,8,'#e33');}
@@ -1193,7 +1193,7 @@ function rushNext(){rushIdx++;rushSetup(rushIdx);termos=Math.max(3,termos);addPt
 function dropGold(x,y){if(LV>=NMAIN||gold)return;let gx=x,g=groundTop(gx);if(g>1e8){gx=P.x+P.face*40;g=groundTop(gx);}if(g>1e8){gx=P.x;g=P.y;}
   gold={x:gx,y:Math.min(y,g-34),gy:g-34,vy:-5,got:0};toastT=220;toastMsg='¡Todos vencidos! Apareció un termo dorado';setTimeout(()=>beep('win'),150);}
 function checkAllClear(x,y){if(enemies.length&&enemies.every(e=>!e.alive))dropGold(x,y);}
-function eatPapas(){flame=1;toastT=220;toastMsg='¡Cappapas! En el aire, saltá otra vez: ¡golpe de fuego!';beep('win');}
+function eatPapas(){flame=1;toastT=220;toastMsg='¡Fueguitas! En el aire, saltá otra vez: ¡golpe de fuego!';beep('win');}
 function flameTongue(x,y,w,h,lean,c1,c2){ctx.fillStyle=c1;ctx.beginPath();ctx.moveTo(x-w,y);ctx.bezierCurveTo(x-w,y-h*.45,x+lean-w*.3,y-h*.7,x+lean,y-h);ctx.bezierCurveTo(x+lean+w*.3,y-h*.7,x+w,y-h*.45,x+w,y);ctx.quadraticCurveTo(x,y+w*.6,x-w,y);ctx.fill();
   if(c2){const w2=w*.5,h2=h*.55;ctx.fillStyle=c2;ctx.beginPath();ctx.moveTo(x-w2,y);ctx.bezierCurveTo(x-w2,y-h2*.5,x+lean*.5-w2*.3,y-h2*.7,x+lean*.5,y-h2);ctx.bezierCurveTo(x+lean*.5+w2*.3,y-h2*.7,x+w2,y-h2*.5,x+w2,y);ctx.closePath();ctx.fill();}}
 const fireSheets={};
@@ -1215,31 +1215,30 @@ function drawFlameFront(){const rl=P.roll||P.dash||P.ball,cy=P.y-(rl?22:26),t=ti
   for(let k=0;k<5;k++){const a=t*.12+k*1.256,x1=Math.cos(a)*R0*.8,y1=Math.sin(a)*R0*.8;ctx.globalAlpha=.5;flameTongue(x1,y1+5,5,13+((t+k*7)%6),dash?-d*10:0,'rgba(255,90,20,.8)','rgba(255,230,140,.9)');}
   ctx.restore();ctx.globalAlpha=1;
   if(t%3===0)parts.push({x:P.x+(Math.random()-.5)*34,y:cy-10-Math.random()*14,vx:(Math.random()-.5)*.6,vy:-1.4-Math.random(),t:0,life:24,col:['#ff2a10','#ff7a1a','#ffd23a'][(t/3|0)%3]});}
-function loseFlame(){if(flame){flame=0;pops.push({x:P.x,y:P.y-80,txt:'¡Se fueron las Cappapas!',t:0});}}
+function loseFlame(){if(flame){flame=0;pops.push({x:P.x,y:P.y-80,txt:'¡Se fueron las Fueguitas!',t:0});}}
 function drawCapper(x,y,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);
-  ctx.fillStyle='#111';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-8,-18,16,36,3);else ctx.rect(-8,-18,16,36);ctx.fill();
-  ctx.fillStyle='#c8ccd2';ctx.fillRect(-7,-20,14,3);ctx.fillRect(-7,17,14,2);
-  ctx.strokeStyle='#3cff4a';ctx.lineWidth=2.6;ctx.lineCap='round';ctx.beginPath();ctx.arc(1,-1,7,0.75,5.55);ctx.stroke();
-  ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(1,-1,4,0.9,5.4);ctx.stroke();
-  ctx.fillStyle='#3cff4a';ctx.font='bold 4.5px sans-serif';ctx.textAlign='center';ctx.fillText('CAPPER',0,13);
-  ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(-6,-16,2,32);ctx.restore();}
+  ctx.fillStyle='#e9f6f4';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-8,-18,16,36,4);else ctx.rect(-8,-18,16,36);ctx.fill();
+  ctx.fillStyle='#1fa59a';ctx.fillRect(-8,-6,16,16);ctx.fillStyle='#b9c4c8';ctx.fillRect(-7,-20,14,3);ctx.fillRect(-7,17,14,2);
+  ctx.fillStyle='#ffd23a';ctx.strokeStyle='#a87a00';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(2,-15);ctx.lineTo(-5,0);ctx.lineTo(0,0);ctx.lineTo(-3,13);ctx.lineTo(5,-3);ctx.lineTo(0,-3);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#0d5f58';ctx.font='bold 4px sans-serif';ctx.textAlign='center';ctx.fillText('RAYITO',0,15);
+  ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillRect(-6,-16,2,32);ctx.restore();}
 function drawCappur(x,y,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);
-  ctx.fillStyle='#f4ecd8';ctx.beginPath();ctx.moveTo(-13,-16);ctx.lineTo(13,-16);ctx.lineTo(15,16);ctx.lineTo(-15,16);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#1d4fa8';ctx.fillRect(-14,-16,28,9);ctx.fillStyle='#f7d23a';ctx.font='bold 5px Georgia,serif';ctx.textAlign='center';ctx.fillText('DON CAPPUR',0,-9.5);
-  ctx.fillStyle='#c98a3a';ctx.strokeStyle='#8a5520';ctx.lineWidth=.8;
-  for(const [bx,by] of [[-6,2],[5,1],[0,9],[-8,10],[8,10]]){ctx.beginPath();ctx.ellipse(bx,by,5,4,0,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#e0a85a';ctx.beginPath();ctx.ellipse(bx-1,by-1,2,1.4,0,0,7);ctx.fill();ctx.fillStyle='#c98a3a';}
-  ctx.fillStyle='#1d4fa8';ctx.font='bold 3.5px sans-serif';ctx.fillText('bizcochos',0,-2.5);ctx.restore();}
+  ctx.fillStyle='#4b2a7a';ctx.beginPath();ctx.moveTo(-13,-16);ctx.lineTo(13,-16);ctx.lineTo(15,16);ctx.lineTo(-15,16);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#ffe9a0';ctx.beginPath();ctx.arc(-1,-9,4.5,0,7);ctx.fill();ctx.fillStyle='#4b2a7a';ctx.beginPath();ctx.arc(1,-10,4,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 5px Georgia,serif';ctx.textAlign='center';ctx.fillText('LUNITAS',0,1.5);
+  ctx.fillStyle='#e6b25a';ctx.strokeStyle='#9a6420';ctx.lineWidth=.8;
+  for(const [bx,by] of [[-7,8],[0,10],[7,8]]){ctx.beginPath();ctx.arc(bx,by,4.5,0,7);ctx.fill();ctx.stroke();}
+  ctx.fillStyle='#ffd23a';for(const [sx,sy] of [[8,-11],[11,-5]]){ctx.fillRect(sx-.8,sy-.8,1.6,1.6);}ctx.restore();}
 function drawVida(x,y,k){drawFrame(0,x,y+14*k/.4,1,.3*k/.4,0,pSheet());}
-function dropPapas(x,y){let gx=x,g=groundTop(gx);if(g>1e8){gx=P.x+P.face*40;g=groundTop(gx);}if(g>1e8){gx=P.x;g=P.y;}papas={x:gx,y:Math.min(y,g-30),gy:g-30,vy:-5,got:0};toastT=220;toastMsg='¡Todos vencidos! Agarrá las Cappapas';setTimeout(()=>beep('win'),150);}
-function eatPapas(){allClear=1;toastT=220;toastMsg='¡Cappapas! Al rodar, Cappy lanza ondas de fuego';beep('win');}
-function drawCappapas(x,y,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);
-  ctx.fillStyle='#c41c1c';ctx.beginPath();ctx.moveTo(-14,-20);ctx.lineTo(14,-20);ctx.lineTo(16,-16);ctx.lineTo(15,16);ctx.lineTo(16,20);ctx.lineTo(-16,20);ctx.lineTo(-15,16);ctx.lineTo(-16,-16);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#8e0f12';for(let i=-14;i<=12;i+=4){ctx.fillRect(i,-20,2,3);ctx.fillRect(i,17,2,3);}
-  ctx.fillStyle='#ff7a1a';ctx.beginPath();ctx.moveTo(-15,-6);ctx.lineTo(15,-12);ctx.lineTo(15,2);ctx.lineTo(-15,8);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#f2b631';ctx.strokeStyle='#b5721a';ctx.lineWidth=1;
-  for(const [cx,cy,r] of [[-7,11,0.3],[2,9,-0.4],[9,12,0.9]]){ctx.save();ctx.translate(cx,cy);ctx.rotate(r);ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(5,4);ctx.lineTo(-5,4);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
-  ctx.fillStyle='#fff';ctx.font='bold 8px Georgia,serif';ctx.textAlign='center';ctx.save();ctx.rotate(-0.2);ctx.fillText('CAPPAPAS',0,1);ctx.restore();
-  ctx.fillStyle='rgba(255,255,255,.22)';ctx.fillRect(-12,-17,3,30);ctx.restore();}
+function dropPapas(x,y){let gx=x,g=groundTop(gx);if(g>1e8){gx=P.x+P.face*40;g=groundTop(gx);}if(g>1e8){gx=P.x;g=P.y;}papas={x:gx,y:Math.min(y,g-30),gy:g-30,vy:-5,got:0};toastT=220;toastMsg='¡Todos vencidos! Agarrá las Fueguitas';setTimeout(()=>beep('win'),150);}
+function eatPapas(){allClear=1;toastT=220;toastMsg='¡Fueguitas! Al rodar, Cappy lanza ondas de fuego';beep('win');}
+function drawFueguitas(x,y,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);
+  ctx.fillStyle='#ff7a1a';ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-10,-18,20,36,5);else ctx.rect(-10,-18,20,36);ctx.fill();
+  ctx.fillStyle='#7a1a0a';ctx.fillRect(-10,-18,20,5);ctx.fillRect(-10,13,20,5);
+  ctx.fillStyle='#ffd23a';ctx.beginPath();ctx.moveTo(0,-11);ctx.quadraticCurveTo(7,-3,4,4);ctx.quadraticCurveTo(0,8,-4,4);ctx.quadraticCurveTo(-7,-3,0,-11);ctx.fill();
+  ctx.fillStyle='#ff3b1a';ctx.beginPath();ctx.moveTo(0,-5);ctx.quadraticCurveTo(3,0,2,3);ctx.quadraticCurveTo(0,5,-2,3);ctx.quadraticCurveTo(-3,0,0,-5);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='bold 4.6px sans-serif';ctx.textAlign='center';ctx.fillText('FUEGUITAS',0,11);
+  ctx.fillStyle='rgba(255,255,255,.25)';ctx.fillRect(-8,-13,2,26);ctx.restore();}
 function addTermo(n,msg){const before=termos;termos=Math.min(MAXT,termos+n);if(termos===before){addPts(1000,P.x,P.y-60);}toastT=150;toastMsg=msg||'¡+1 termo!';setTimeout(()=>beep('win'),100);}
 function die(){if(P.dead)return;termos=0;flame=0;P.dead=1;P.vy=-7;P.vx=0;P.ground=null;deadT=0;beep('hurt');}
 function puff(x,y,n,col){for(let i=0;i<n;i++)parts.push({x,y,vx:(Math.random()-.5)*3,vy:-Math.random()*2.5,t:0,life:25+Math.random()*15,col});}
@@ -1351,8 +1350,8 @@ function step(){if(state==='busy'||adOn)return;
     if(Math.abs(P.x-m.x)<20&&my>P.y-mph-14&&my<P.y+10){
       m.b=1;puff(m.x,my,14,ITEM_COL[m.type]);beep('rosa');addPts(10,m.x,my-30);
       const t=m.type;
-      if(t==='cappur'){if(cappur<5){cappur++;pops.push({x:m.x,y:m.y-70,txt:'+1 Don Cappur',t:0});}else addPts(500,m.x,m.y-70);beep('cp');}
-      else if(t==='capper'){P.speedT=900;beep('dash');pops.push({x:m.x,y:m.y-70,txt:'¡Capper!',t:0});}
+      if(t==='cappur'){if(cappur<5){cappur++;pops.push({x:m.x,y:m.y-70,txt:'+1 Lunitas',t:0});}else addPts(500,m.x,m.y-70);beep('cp');}
+      else if(t==='capper'){P.speedT=900;beep('dash');pops.push({x:m.x,y:m.y-70,txt:'¡Rayito!',t:0});}
       else if(t==='papas'){eatPapas();}
       else if(t==='vida'){lives++;toastT=150;toastMsg='¡+1 vida!';setTimeout(()=>beep('win'),100);}
       else if(t==='termo'){addTermo(1,'¡+1 termo!');}}}
@@ -1688,10 +1687,10 @@ function drawWorld(cx,cy){
     const col=ITEM_COL[m.type];drawGlow(m.x,y,26+Math.sin(timeF*.15)*3,hexA(col,.55));
     if(m.type==='cappur')drawCappur(m.x,y,.85);
     else if(m.type==='capper')drawCapper(m.x,y,.85);
-    else if(m.type==='papas')drawCappapas(m.x,y,.8);
+    else if(m.type==='papas')drawFueguitas(m.x,y,.8);
     else if(m.type==='vida')drawVida(m.x,y,.55);
     else if(m.type==='termo')drawTermo(m.x,y-3,.85);}
-  if(false&&papas&&!papas.got){ctx.fillStyle='rgba(255,140,40,.3)';ctx.beginPath();ctx.arc(papas.x,papas.y,22+Math.sin(timeF*.12)*3,0,7);ctx.fill();drawCappapas(papas.x,papas.y+Math.sin(timeF*.08)*3,1);}
+  if(false&&papas&&!papas.got){ctx.fillStyle='rgba(255,140,40,.3)';ctx.beginPath();ctx.arc(papas.x,papas.y,22+Math.sin(timeF*.12)*3,0,7);ctx.fill();drawFueguitas(papas.x,papas.y+Math.sin(timeF*.08)*3,1);}
   if(gold){const a=gold.got?0:1, had=SAVE.gold&&SAVE.gold[LV];
     if(!gold.got){ctx.globalAlpha=had?.55:1;drawGlow(gold.x,gold.y,30+Math.sin(timeF*.1)*4,'rgba(255,210,60,.7)');
       drawTermo(gold.x,gold.y+Math.sin(timeF*.08)*3,1.1,1);if(timeF%9===0)parts.push({x:gold.x+(Math.random()-.5)*26,y:gold.y+10,vx:0,vy:-1.2,t:0,life:26,col:'#fff2a0'});ctx.globalAlpha=1;}}
@@ -1755,7 +1754,7 @@ function drawHUD(){
    if(termoLostT>0){termoLostT--;hudText('-1',20+termos*19,112-(40-termoLostT)*.4,14,'center','#ff6a6a');}
    for(let j=0;j<cappur;j++){drawCappur(tx+6,128,.5);tx+=22;}}
   let ix=14;const SY=158;
-  if(P.speedT){drawCapper(ix+6,SY,.5);ix+=22;} if(flame){drawCappapas(ix+6,SY,.4);ix+=22;} if(P.starT){hudText('⭐',ix,SY+4,13);ix+=22;}
+  if(P.speedT){drawCapper(ix+6,SY,.5);ix+=22;} if(flame){drawFueguitas(ix+6,SY,.4);ix+=22;} if(P.starT){hudText('⭐',ix,SY+4,13);ix+=22;}
   if(gold&&gold.got){drawTermo(ix+6,SY,.5,1);ix+=22;}
   const s=Math.floor(timeF/60);hudText(Math.floor(s/60)+':'+String(s%60).padStart(2,'0'),W/2,28,18,'center');
   if(cur&&cur.rush&&state!=='title')hudText('Torneo '+(rushIdx+1)+'/'+RUSH.length,W/2,50,13,'center','#ff6ad5');
