@@ -139,7 +139,7 @@ function langBtn(){return {x:74,y:88,w:124,h:26};}
 let ac=null;
 const CG=0; // 1 = versión CrazyGames (se activa al armar ese paquete)
 let CGS=null,adOn=0,lastPlay=false;
-function cgInit(){if(!CG)return;try{const S=window.CrazyGames&&window.CrazyGames.SDK;if(!S)return;S.init().then(()=>{CGS=S;try{S.game.loadingStop();}catch(e){}}).catch(()=>{});}catch(e){}}
+function cgInit(){if(!CG)return;try{const S=window.CrazyGames&&window.CrazyGames.SDK;if(!S)return;S.init().then(()=>{CGS=S;try{const j=S.data&&S.data.getItem('cappy_save');if(j){const o=JSON.parse(j);if(o&&typeof o==='object')Object.assign(SAVE,o);}else saveGame();}catch(e){}try{S.game.loadingStop();}catch(e){}}).catch(()=>{});}catch(e){}}
 function cgAd(type,onReward,onDone){if(!CGS){if(onDone)onDone(false);return;}adOn=1;try{if(ac)ac.suspend();}catch(e){}
   let fin=0;const end=ok=>{if(fin)return;fin=1;adOn=0;try{if(ac)ac.resume();}catch(e){}if(ok&&onReward)onReward();if(onDone)onDone(ok);};
   try{CGS.ad.requestAd(type,{adStarted:()=>{adOn=1;try{if(ac)ac.suspend();}catch(e){}},adFinished:()=>end(true),adError:()=>end(false)});}catch(e){end(false);}}
@@ -866,7 +866,7 @@ const DIALOG=[
 const PHASE_TALK={0:'¡¿Creíste que ya estaba?! ¡Ahora va en serio!',1:'Esto recién empieza... ¡siento el poder del hielo!'};
 let SAVE={done:0,rec:{},wallet:0,outfits:['clasico'],outfit:'clasico'};
 try{const s=JSON.parse(localStorage.getItem('cappy_save')||'null');if(s)SAVE=Object.assign(SAVE,s);}catch(e){}
-function saveGame(){try{localStorage.setItem('cappy_save',JSON.stringify(SAVE));}catch(e){}}
+function saveGame(){const j=JSON.stringify(SAVE);try{localStorage.setItem('cappy_save',j);}catch(e){}try{if(CGS&&CGS.data)CGS.data.setItem('cappy_save',j);}catch(e){}}
 let points=0, lvlStart=0, lifePts=50000, single=0, talk=null, talkDone=0, lastRes=null, totalMates=0, tapPos=null;
 const GRADE_COL={S:'#ffd23a',A:'#9be05a',B:'#6ab8ff',C:'#d8a0b0'};
 const fmtT=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
