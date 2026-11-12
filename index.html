@@ -138,11 +138,11 @@ function setLang(l){LANG=l;TRC.clear();try{localStorage.setItem('cappy_lang',l);
 function langBtn(){return {x:74,y:88,w:124,h:26};}
 let ac=null;
 const CG=0; // 1 = versión CrazyGames (se activa al armar ese paquete)
-let CGS=null,adOn=0,lastPlay=false;
+let CGS=null,adOn=0,lastPlay=false,cgAdsOK=0;
 function cgInit(){if(!CG)return;try{const S=window.CrazyGames&&window.CrazyGames.SDK;if(!S)return;S.init().then(()=>{CGS=S;try{const j=S.data&&S.data.getItem('cappy_save');if(j){const o=JSON.parse(j);if(o&&typeof o==='object')Object.assign(SAVE,o);}else saveGame();}catch(e){}try{S.game.loadingStop();}catch(e){}}).catch(()=>{});}catch(e){}}
 function cgAd(type,onReward,onDone){if(!CGS){if(onDone)onDone(false);return;}adOn=1;try{if(ac)ac.suspend();}catch(e){}
   let fin=0;const end=ok=>{if(fin)return;fin=1;adOn=0;try{if(ac)ac.resume();}catch(e){}if(ok&&onReward)onReward();if(onDone)onDone(ok);};
-  try{CGS.ad.requestAd(type,{adStarted:()=>{adOn=1;try{if(ac)ac.suspend();}catch(e){}},adFinished:()=>end(true),adError:()=>end(false)});}catch(e){end(false);}}
+  try{CGS.ad.requestAd(type,{adStarted:()=>{adOn=1;cgAdsOK=1;try{if(ac)ac.suspend();}catch(e){}},adFinished:()=>end(true),adError:()=>end(false)});}catch(e){end(false);}}
 function cgTrack(){if(!CGS)return;const p=state==='play'&&!adOn;if(p!==lastPlay){lastPlay=p;try{p?CGS.game.gameplayStart():CGS.game.gameplayStop();}catch(e){}}}
 function beep(type){
   if(!ac)return; const t=ac.currentTime, o=ac.createOscillator(), g=ac.createGain(); o.connect(g); g.connect(ac.destination);
@@ -894,7 +894,7 @@ function spend(p){const w=SAVE.wallet||0;if(w>=p){SAVE.wallet=w-p;}else{score-=(
 function shopBtns(){const B=[],L0=118,AW=W-L0-10,cols=4,cw=Math.min(132,AW/cols-8),cx0=L0+AW/2;
   {const iw=Math.min(cw+4,AW/SHOP_ITEMS.length-6);SHOP_ITEMS.forEach((it,i)=>B.push({kind:'item',it,x:cx0+(i-(SHOP_ITEMS.length-1)/2)*(iw+6),y:140,w:iw,h:38}));}
   OUTFITS.forEach((o,i)=>{const r=Math.floor(i/cols),c=i%cols;B.push({kind:'outfit',it:o,x:cx0+(c-1.5)*(cw+8),y:198+r*42,w:cw,h:36});});
-  B.push({kind:'exit',x:60,y:H-20,w:100,h:30});if(CGS)B.push({kind:'adm',x:W-120,y:H-20,w:210,h:30});return B;}
+  B.push({kind:'exit',x:60,y:H-20,w:100,h:30});if(CGS&&cgAdsOK)B.push({kind:'adm',x:W-120,y:H-20,w:210,h:30});return B;}
 function shopTap(){for(const b of shopBtns()){if(!inBtn(b))continue;
   if(b.kind==='exit'){state='play';prevJ.v=1;shopPrev=null;return;}
   if(b.kind==='adm'){cgAd('rewarded',()=>{SAVE.wallet=(SAVE.wallet||0)+100;saveGame();shopMsg='¡Gracias por mirar! +100 mates.';beep('win');},ok=>{if(!ok)shopMsg='No hay anuncios disponibles ahora. Probá en un rato.';});return;}
