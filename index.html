@@ -1864,6 +1864,9 @@ let openCount=null,openLocal=0;try{openLocal=(+localStorage.getItem('cappy_opens
 (function(){const NS='cappy-la-carpincho-julian152027',K='aperturas';let first=true;try{first=!sessionStorage.getItem('cappy_open');sessionStorage.setItem('cappy_open','1');}catch(e){}
   if(!CG)try{fetch('https://api.counterapi.dev/v1/'+NS+'/'+K+(first?'/up':'')).then(r=>r.json()).then(j=>{if(typeof j.count==='number')openCount=j.count;}).catch(()=>{});}catch(e){}})();
 resize();spawn();buildLevel();requestAnimationFrame(loop);
+if(CG){try{newGame();}catch(e){}
+  const unlockA=()=>{try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended'&&!adOn)ac.resume();musInit();}catch(e){}removeEventListener('keydown',unlockA,true);removeEventListener('pointerdown',unlockA,true);};
+  addEventListener('keydown',unlockA,true);addEventListener('pointerdown',unlockA,true);}
 cgInit();try{if(!CG&&'serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 </script>
 </body>
